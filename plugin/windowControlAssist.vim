@@ -11,68 +11,20 @@ endif
 let s:windowControl = {}
 let g:WindowControlAssist = s:windowControl
 
-" -------------------------------------
-"  サイドメニュー操作
-" -------------------------------------
-" OpenSideMenu
-" CheckActiveSideMenu
-" SetActionSideMenu
-" CloseSideMenu
-"
-" -------------------------------------
-"  文字入力を行うエリアの作成
-" -------------------------------------
-"
-"
-"winnr("#")
-
-" ----------------------------------
-" sideMenu
-" ----------------------------------
 function! s:windowControl.OpenSideMenu(menuName, width)
-  " タブに名前が設定されているか確認
-  if !exists('t:sideMenu_' . a:menuName)
-    " バッファ名が指定されていない場合、名前を取得し、設定 
-    let l:hoge = 1
-    silent! execute 'let t:sideMenu_' . a:menuName . ' = "' . a:menuName . '_SM' . windowControlAssist#etc#GetSequence() . '"'
-  else 
-    let l:hoge = 2
-  endif
-
-  silent! execute 'let t:sideMenuTemp = t:sideMenu_' . a:menuName
-  call windowControlAssist#window#OpenOutside('l', a:width)
-  call windowControlAssist#file#OpenPreview(t:sideMenuTemp)
-  unlet t:sideMenuTemp
-  return l:hoge
+  return windowControlAssist#sidemenu#Open(a:menuName, a:width)
 endfunction
 
 function! s:windowControl.CheckActiveSideMenu(menuName)
-  if exists('t:sideMenu_' . a:menuName)
-    silent! execute 'let t:sideMenuTemp = t:sideMenu_' . a:menuName
-    let l:ans = windowControlAssist#search#WindownoByFilename(t:sideMenuTemp)
-    unlet t:sideMenuTemp
-  else
-    let l:ans = -1
-  endif
-  return l:ans
+  return windowControlAssist#sidemenu#CheckActive(a:menuName)
+endfunction
+
+function! s:windowControl.CloseSideMenu(menuName)
+  return windowControlAssist#sidemenu#Close(a:menuName)
 endfunction
 
 function! s:windowControl.SetActionSideMenu(key, methodName)
   silent! execute 'nnoremap <silent> <buffer> ' . a:key . ' :call ' .  a:methodName . '(line(".")) <CR>'
-  return 1
-endfunction
-
-function! s:windowControl.CloseSideMenu(menuName)
-  silent! execute 'let t:sideMenuTemp = t:sideMenu_' . a:menuName
-  let l:sideMenuWindowno = windowControlAssist#search#WindownoByFilename(t:sideMenuTemp)
-  if l:sideMenuWindowno == -1
-    return -1
-  endif
-  if !windowControlAssist#window#CloseByWindowno(l:sideMenuWindowno, 0)
-    "閉じれなかった場合
-    return -1
-  endif
-  unlet t:sideMenuTemp
   return 1
 endfunction
 
